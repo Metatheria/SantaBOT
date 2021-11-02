@@ -65,9 +65,9 @@ async def on_ready():
         if user is None:
             print("user " + user + " not found")
         else:
-            await user.send("Ton bébé Noël est ||" + names[giftees[i]] + "|| !\n"
-                          + "Son adresse est || " + addresses[giftees[i]] + "||\n"
-                          + "Il t'a laissé le message suivant : ||" + messages[giftees[i]] + "||")
+            await user.send("Your giftee is ||" + names[giftees[i]] + "|| !\n"
+                          + "Their address is || " + addresses[giftees[i]] + "||\n"
+                          + "They left the following message for you : ||" + messages[giftees[i]] + "||")
                              
 
 #ENTER THE TOKEN OF YOUR DISCORD BOT HERE
