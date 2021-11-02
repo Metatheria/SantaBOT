@@ -68,7 +68,8 @@ async def on_ready():
             await user.send("Your giftee is ||" + names[giftees[i]] + "|| !\n"
                           + "Their address is || " + addresses[giftees[i]] + "||\n"
                           + "They left the following message for you : ||" + messages[giftees[i]] + "||")
-    client.close()                             
+    print("Done!")
+    await client.close()                             
 
 #ENTER THE TOKEN OF YOUR DISCORD BOT HERE
 client.run("your-bot-token")
