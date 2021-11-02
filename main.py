@@ -41,6 +41,14 @@ if not names:
 
 n = len(names)
 
+print("This script will send a DM to the " + str(n) + " following people.")
+for name in names:
+    print(name)
+
+if input("Do you want to proceed?(yes/no)") != "yes":
+    print("Aborting")
+    sys.exit()
+
 ok = False
 while not ok:
     giftees=[i for i in range(n)]
