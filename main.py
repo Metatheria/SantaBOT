@@ -5,6 +5,7 @@ from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 import os
 import random
+import sys
 
 from config import Config
 
@@ -21,12 +22,15 @@ sheet = service.spreadsheets()
 result_input = sheet.values().get(spreadsheetId=Config.SPREADSHEET_ID,
                                 range=Config.RANGE_NAME).execute()
 
-names = [line[0] for line in  result_input.get('values', [])]
+i = 0
+
+names = [line[i] for line in  result_input.get('values', [])]
 if Config.HAS_ADDRESS:
-    addresses = [line[1] for line in  result_input.get('values', [])]
-    messages = [line[2] for line in  result_input.get('values', [])]
-else:
-    messages = [line[1] for line in  result_input.get('values', [])]
+    i += 1
+    addresses = [line[i] for line in  result_input.get('values', [])]
+i += 1
+messages = [line[1] for line in  result_input.get('values', [])]
+
 
 """
 print(names)
@@ -43,10 +47,14 @@ print("This script will send a DM to the " + str(n) + " following people.")
 for name in names:
     print(name)
 
+if Config.DRY_RUN:
+    print('[THIS IS A DRY RUN]')
+
 if input("Do you want to proceed?(yes/no)") != "yes":
     print("Aborting")
     sys.exit()
 
+# TODO Conflict management
 ok = False
 while not ok:
     giftees=[i for i in range(n)]
@@ -68,16 +76,24 @@ async def on_ready():
     #    print(m)
     for i in range(n):
         user = discord.utils.get(client.get_all_members(), name=names[i][:-5], discriminator=names[i][-4:])
-        if user is None:
-            print("user " + user + " not found")
+        message = f'Your giftee is ||{names[giftees[i]]}|| !\n'
+        
+        if Config.HAS_ADDRESS:
+            message += f'Their address is:\n||{addresses[giftees[i]]}||\n'
+        
+        m = messages[giftees[i]]
+        if m:
+            message += f'They left the following message for you: \n||{messages[giftees[i]]}||\n'
+
+        if Config.DRY_RUN:
+            print(f'[MESSAGE FOR {names[i]}]')
+            print(message)
         else:
-            if Config.HAS_ADDRESS:
-                await user.send("Your giftee is ||" + names[giftees[i]] + "|| !\n"
-                            + "Their address is || " + addresses[giftees[i]] + "||\n"
-                            + "They left the following message for you : ||" + messages[giftees[i]] + "||")
+            if user is None:
+                print("user " + user + " not found", file=sys.stderr)
+                print(message)
             else:
-                await user.send("Your giftee is ||" + names[giftees[i]] + "|| !\n"
-                            + "They left the following message for you : ||" + messages[giftees[i]] + "||")
+                user.send(message)
 
     print("Done!")
     await client.close()                             
