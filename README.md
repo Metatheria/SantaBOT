@@ -24,7 +24,7 @@ Column D (starting at D2) should contain an (optional) message from giftees to t
 
 6-Go to the [Discord Developer Portal](https://discord.com/developers/applications) and create a new application.
 
-7-Copy the bot's token into the code.
+7-Configure all the variables in a configuration file (``cp config.py.sample config.py`` and edit this ``config.py`` file).
 
 8-Invite the bot to a server with all the participants.
 

@@ -6,29 +6,27 @@ from google.oauth2 import service_account
 import os
 import random
 
+from config import Config
+
 intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents=intents)
 
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-key_file = 'your-key.json'#replace with the name of your Google API key file
-
-#ENTER THE ID OF YOUR GOOGLE SHEET HERE
-SAMPLE_SPREADSHEET_ID_input = 'your-sheet-id'
-SAMPLE_RANGE_NAME = 'B2:D'
-
-creds = service_account.Credentials.from_service_account_file(key_file, scopes=SCOPES) # here enter the name of your downloaded JSON file
+creds = service_account.Credentials.from_service_account_file(Config.GOOGLE_KEY_FILE, scopes=Config.SHEET_SCOPES) # here enter the name of your downloaded JSON file
 
 service = build('sheets', 'v4', credentials=creds)
 
 # Call the Sheets API
 sheet = service.spreadsheets()
-result_input = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID_input,
-                                range=SAMPLE_RANGE_NAME).execute()
-    
+result_input = sheet.values().get(spreadsheetId=Config.SPREADSHEET_ID,
+                                range=Config.RANGE_NAME).execute()
+
 names = [line[0] for line in  result_input.get('values', [])]
-addresses = [line[1] for line in  result_input.get('values', [])]
-messages = [line[2] for line in  result_input.get('values', [])]
+if Config.HAS_ADDRESS:
+    addresses = [line[1] for line in  result_input.get('values', [])]
+    messages = [line[2] for line in  result_input.get('values', [])]
+else:
+    messages = [line[1] for line in  result_input.get('values', [])]
 
 """
 print(names)
@@ -73,12 +71,17 @@ async def on_ready():
         if user is None:
             print("user " + user + " not found")
         else:
-            await user.send("Your giftee is ||" + names[giftees[i]] + "|| !\n"
-                          + "Their address is || " + addresses[giftees[i]] + "||\n"
-                          + "They left the following message for you : ||" + messages[giftees[i]] + "||")
+            if HAS_ADDRESS:
+                await user.send("Your giftee is ||" + names[giftees[i]] + "|| !\n"
+                            + "Their address is || " + addresses[giftees[i]] + "||\n"
+                            + "They left the following message for you : ||" + messages[giftees[i]] + "||")
+            else:
+                await user.send("Your giftee is ||" + names[giftees[i]] + "|| !\n"
+                            + "They left the following message for you : ||" + messages[giftees[i]] + "||")
+
     print("Done!")
     await client.close()                             
 
 #ENTER THE TOKEN OF YOUR DISCORD BOT HERE
-client.run("your-bot-token")
+client.run(Config.DISCORD_BOT_TOKEN)
 

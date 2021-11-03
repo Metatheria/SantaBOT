@@ -1,0 +1,11 @@
+class Config:
+    SHEETS_SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+    GOOGLE_KEY_FILE = 'your-key.json'#replace with the name of your Google API key file
+    
+    #ENTER THE ID OF YOUR GOOGLE SHEET HERE
+    SPREADSHEET_ID = 'your-sheet-id'
+    RANGE_NAME = 'B2:D'
+
+    DISCORD_BOT_TOKEN = 'your discord bot token'
+    HAS_ADDRESS = True
+
