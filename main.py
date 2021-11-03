@@ -12,7 +12,7 @@ intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents=intents)
 
-creds = service_account.Credentials.from_service_account_file(Config.GOOGLE_KEY_FILE, scopes=Config.SHEET_SCOPES) # here enter the name of your downloaded JSON file
+creds = service_account.Credentials.from_service_account_file(Config.GOOGLE_KEY_FILE, scopes=Config.SHEETS_SCOPES) # here enter the name of your downloaded JSON file
 
 service = build('sheets', 'v4', credentials=creds)
 
@@ -71,7 +71,7 @@ async def on_ready():
         if user is None:
             print("user " + user + " not found")
         else:
-            if HAS_ADDRESS:
+            if Config.HAS_ADDRESS:
                 await user.send("Your giftee is ||" + names[giftees[i]] + "|| !\n"
                             + "Their address is || " + addresses[giftees[i]] + "||\n"
                             + "They left the following message for you : ||" + messages[giftees[i]] + "||")
