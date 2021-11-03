@@ -7,7 +7,7 @@ class Config:
 
     DISCORD_BOT_TOKEN = 'your discord bot token'			# Replace with your Discord bot token
     HAS_ADDRESS = True							# Has the form addresses ? (in case needed deliveries)
-    HAS_CONFLICT_MANAGEMENT = False					# (EXPERIMENTAL) Should the bot manage conflicts and exceptions?
+    HAS_CONFLICT_MANAGEMENT = False					# (EXPERIMENTAL) Should the bot manage conflicts and exceptions? Slow algorithm, only use with small amount of giftees!
     
     DRY_RUN = True							# Is this a dry run ? True will print to console instead of sending PM
 
