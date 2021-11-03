@@ -12,9 +12,9 @@ Column D (starting at D2) should contain an (optional) message from giftees to t
 
 **How to use it?**
 
-1-Install discord.py and the Python Google API : ``pip install discord`` and ``pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib``
+1-Install dependencies ``pip install -r requirements.txt``.
 
-2-Create a project on [Google Cloud](https://console.cloud.google.com/home/dashboard?project=santabot-330812&hl=fr).
+2-Create a project on [Google Cloud](https://console.cloud.google.com/home/dashboard).
 
 3-Go to "API and Services", then browse the library and add the Google Sheet API.
 
