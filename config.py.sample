@@ -6,8 +6,8 @@ class Config:
     RANGE_NAME = 'B2:D'							# Used Range in the spreadsheet
 
     DISCORD_BOT_TOKEN = 'your discord bot token'			# Replace with your Discord bot token
-    HAS_ADDRESS = True							# Has the form addresses ? (in case needed deliveries)
-    HAS_CONFLICT_MANAGEMENT = False					# (EXPERIMENTAL) Should the bot manage conflicts and exceptions? Slow algorithm, only use with small amount of giftees!
+    HAS_ADDRESS = True							# Does the form include postal addresses ? (in case deliveries are needed)
+    HAS_CONFLICT_MANAGEMENT = False					# Should the bot manage conflicts and exceptions? (will fail if there are too many constraints) 
     
     DRY_RUN = True							# Is this a dry run ? True will print to console instead of sending PM
 
