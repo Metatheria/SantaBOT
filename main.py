@@ -5,7 +5,6 @@ from google.oauth2 import service_account
 import discord
 import random
 import sys
-import numpy as np
 
 from config import Config
 from maxflow import maxflow
@@ -64,7 +63,7 @@ if input("Do you want to proceed?(yes/no)") != "yes":
     print("Aborting...")
     sys.exit()
 
-graph = np.zeros((2*n+2, 2*n+2))
+graph = [[0]*(2*n+2) for _ in range(2*n+2)] 
 hat = [i for i in range(n)]
 giftees = [-1]*n
 random.shuffle(hat)
@@ -74,7 +73,6 @@ for i in range(n):
     for j in range(n):
         if j not in conflicts[i]:
             graph[hat[i]+1][n+j+1] = 1
-
 flow = maxflow(graph,0,2*n+1)
 if flow < n:
     print("Too many constraints, problem is unsolvable\nAborting...")
@@ -82,19 +80,17 @@ if flow < n:
 else:
     message = ["" for _ in range(n)]
     for i in range(n):
-        giftees[i] = hat.index(np.where(graph[i+n+1] == 1)[0][0]-1)
+        santa = hat.index(graph[i+n+1].index(1)-1)
+        giftees[santa] = i
 
-        message[i] = f'Your giftee is ||{names[giftees[i]]}|| !\n'
+        message[santa] = f'Your giftee is ||{names[i]}|| !\n'
         
         if Config.HAS_ADDRESS:
-            message[i] += f'Their address is:\n||{addresses[giftees[i]]}||\n'
+            message[santa] = f'Their address is:\n||{addresses[i]}||\n'
         
         if secretMessages[giftees[i]]:
-            message[i] += f'They left the following message for you: \n||{secretMessages[giftees[i]]}||\n'
+            message[santa] += f'They left the following message for you: \n||{secretMessages[i]}||\n'
         
-        if Config.DRY_RUN:
-            print(f'[MESSAGE FOR {names[i]}]')
-            print(message)
 
 @client.event
 async def on_ready():
@@ -127,6 +123,10 @@ async def on_ready():
         print("Done!")
     await client.close()
 
-if not Config.DRY_RUN:
+if Config.DRY_RUN:
+    for i in range(n):
+        print(f'[MESSAGE FOR {names[i]}]')
+        print(message[i])
+else:
     client.run(Config.DISCORD_BOT_TOKEN)
 
