@@ -74,7 +74,7 @@ if Config.HAS_ADDRESS:
     addresses = [line[i] for line in result_input.get('values', [])]
 
 i += 1
-secretMessages = [line[i] for line in  result_input.get('values', [])]
+secretMessages = [(line[i] if len(line) > i else '') for line in result_input.get('values', [])]
 
 
 if Config.HAS_CONFLICT_MANAGEMENT:
@@ -114,19 +114,21 @@ if flow < n:
     print("Too many constraints, problem is unsolvable\nAborting...")
     sys.exit()
 else:
-    message = ["" for _ in range(n)]
+    messages = ["" for _ in range(n)]
     for i in range(n):
         santa = hat.index(graph[i+n+1].index(1)-1)
         giftees[santa] = i
 
-        message[santa] = f'Your giftee is ||{names[i]}|| !\n'
+        messages[santa] = f"Ton bébé Noël est...|| ** {names[i]} ** || !\n" 
         
         if Config.HAS_ADDRESS:
-            message[santa] = f'Their address is:\n||{addresses[i]}||\n'
+            messages[santa] += f'\nSon adresse est:\n {addresses[i]} \n'
         
         if secretMessages[giftees[i]]:
-            message[santa] += f'They left the following message for you: \n||{secretMessages[i]}||\n'
-        
+            if secretMessages[i] != '':
+                messages[santa] += f'\nIel t\'a laissé le message suivant: {secretMessages[i]}'
+            else:
+                messages[santa] += "\nIel ne t'a pas laissé de message."
 
 @client.event
 async def on_ready():
@@ -142,7 +144,7 @@ async def on_ready():
             fail = True
         else:
             try:
-                await user.send("Matching is about to begin, please wait")
+                await user.send("Le tirage au sort va commencer, veuillez patienter...")
             except:
                 print("Could not DM user " + contacts[i])
                 fail = True
@@ -155,17 +157,23 @@ async def on_ready():
 
     else:
         for i in range(len(successful_users)):
-            await successful_users[i].send(message[i])
-        print("Done!")
+            start_index = 0
+            while len(messages[i][start_index:]) > 2000:
+                final_index = min(start_index+1999, len(messages[i])-1)
+                while messages[i][final_index] != ' ':
+                    final_index -= 1
+                await successful_users[i].send(messages[i][start_index:final_index])
+                start_index = final_index+2
+            await successful_users[i].send(messages[i][start_index:])
     await client.close()
 
 if Config.DRY_RUN:
     for i in range(n):
         print(f'[MESSAGE FOR {names[i]}]')
-        print(message[i])
+        print(messages[i])
 else:
     if Config.CONTACT_METHOD == 'email':
-        send_emails(message, names)
+        send_emails(messages, names)
         print("Done!")
     elif Config.CONTACT_METHOD == 'discord':
         client.run(Config.DISCORD_BOT_TOKEN)
