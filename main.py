@@ -5,9 +5,42 @@ from google.oauth2 import service_account
 import discord
 import random
 import sys
+import smtplib
+import ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.header import Header
 
 from config import Config
 from maxflow import maxflow
+
+def send_emails(messages, names):
+    port = 465  # For SSL
+    password = Config.BOT_PASSWORD
+    sender_email = Config.BOT_EMAIL
+    
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+        server.login(sender_email, password)
+        for i in range(n):
+            email = MIMEMultipart('alternative')
+
+            email.set_charset('utf8')
+
+            email['FROM'] = sender_email
+
+            bodyStr = ''
+            #This solved the problem with the encode on the subject.
+            email['Subject'] = Header(f"Tirage au sort Secret Santa {names[i]}",'utf-8')
+            email['To'] = contacts[i]
+
+            # And this on the body
+            _attach = MIMEText(messages[i].encode('utf-8'), 'html', 'UTF-8')        
+
+            email.attach(_attach)
+
+            # Create a secure SSL context
+            server.sendmail(sender_email, contacts[i], email.as_string())
 
 intents = discord.Intents.default()
 intents.members = True
@@ -35,7 +68,7 @@ n = len(names)
 
 if Config.HAS_ADDRESS:
     i += 1
-    addresses = [line[i] for line in  result_input.get('values', [])]
+    addresses = [line[i] for line in result_input.get('values', [])]
 
 i += 1
 secretMessages = [line[i] for line in  result_input.get('values', [])]
@@ -52,9 +85,9 @@ for c in range(n):
 print(conflicts)
 
 
-print("This script will send a DM to the " + str(n) + " following people:")
-for name in names:
-    print(name)
+print("This script will send a message to the " + str(n) + " following people:")
+for contact in contacts:
+    print(contact)
 
 if Config.DRY_RUN:
     print('[THIS IS A DRY RUN]')
@@ -128,5 +161,11 @@ if Config.DRY_RUN:
         print(f'[MESSAGE FOR {names[i]}]')
         print(message[i])
 else:
-    client.run(Config.DISCORD_BOT_TOKEN)
-
+    if Config.CONTACT_METHOD == 'email':
+        send_emails(message, names)
+        print("Done!")
+    elif Config.CONTACT_METHOD == 'discord':
+        client.run(Config.DISCORD_BOT_TOKEN)
+        print("Done!")
+    else:
+        print("You have not selected a valid contact method!\nPlease select either \'email\' or \'discord\' in config.py")
