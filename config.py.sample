@@ -1,17 +1,32 @@
+"""Module defining configuration for SantaBOT"""
+
+
 class Config:
-    SHEETS_SCOPES = ['https://www.googleapis.com/auth/spreadsheets']	# You should not have to touch this line
-    GOOGLE_KEY_FILE = 'your-key.json'					# Your Google API key file
+    """Class storing configuration constants."""
+    # You should not have to touch this line
+    SHEETS_SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+    # Your Google API key file
+    GOOGLE_KEY_FILE = 'your-key.json'
 
-    SPREADSHEET_ID = 'your-sheet-id'					# ID Of the Spreadsheet
-    RANGE_NAME = 'B2:D'							# Used Range in the spreadsheet
-	
-    DISCORD_BOT_TOKEN = 'your discord bot token'			# Replace with your Discord bot token (if sending messages via Discord)
-    BOT_EMAIL = ''    							# Replace with your bot's email address (if sending emails)
-    BOT_PASSWORD = ''    							# Replace with your bot's email password (if sending emails)
+    # ID Of the Spreadsheet
+    SPREADSHEET_ID = 'your-sheet-id'
+    # Used Range in the spreadsheet
+    RANGE_NAME = 'B2:D'
 
-    CONTACT_METHOD = 'discord'						# Value is either 'discord' or 'email'
-    HAS_ADDRESS = True							# Does the form include postal addresses ? (in case deliveries are needed)
-    HAS_CONFLICT_MANAGEMENT = False					# Should the bot manage conflicts and exceptions? (will fail if there are too many constraints) 
-    
-    DRY_RUN = True							# Is this a dry run ? True will print to console instead of sending PM
+    # Replace with your Discord bot token (if sending messages via Discord)
+    DISCORD_BOT_TOKEN = 'your discord bot token'
+    # Replace with your bot's email address (if sending emails)
+    BOT_EMAIL = ''
+    # Replace with your bot's email password (if sending emails)
+    BOT_PASSWORD = ''
 
+    # Value is either 'discord' or 'email'
+    CONTACT_METHOD = 'discord'
+    # Does the form include postal addresses ? (in case deliveries are needed)
+    HAS_ADDRESS = True
+    # Should the bot manage conflicts and exceptions?
+    # (will fail if there are too many constraints)
+    HAS_CONFLICT_MANAGEMENT = False
+
+    # Is this a dry run ? True will print to console instead of sending PM
+    DRY_RUN = True

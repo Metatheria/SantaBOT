@@ -1,6 +1,11 @@
+"""Module implementing a maxflow algorithm
+
+https://en.wikipedia.org/wiki/Maximum_flow_problem"""
+
 import math
 
-def find_next_node (graph, source, sink, forbidden):
+
+def find_next_node(graph, source, sink, forbidden):
     for i in range(len(graph[source])):
         if graph[source][i] > 0 and i not in forbidden:
             path = find_path(graph, i, sink, forbidden)
