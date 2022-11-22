@@ -66,6 +66,9 @@ if not names:
 
 n = len(names)
 
+i += 1
+contacts = [line[i] for line in  result_input.get('values', [])]
+
 if Config.HAS_ADDRESS:
     i += 1
     addresses = [line[i] for line in result_input.get('values', [])]
@@ -133,22 +136,22 @@ async def on_ready():
     fail = False
     successful_users = []
     for i in range(n):
-        user = discord.utils.get(client.get_all_members(), name=names[i][:-5], discriminator=names[i][-4:])
+        user = discord.utils.get(client.get_all_members(), name=contacts[i][:-5], discriminator=contacts[i][-4:])
         if user is None:
-            print("user " + names[i] + " not found", file=sys.stderr)
+            print("user " + contacts[i] + " not found", file=sys.stderr)
             fail = True
         else:
             try:
                 await user.send("Matching is about to begin, please wait")
             except:
-                print("Could not DM user " + names[i])
+                print("Could not DM user " + contacts[i])
                 fail = True
             else:
                 successful_users+=[user]
     if fail:
         print("Aborting...")
         for u in successful_users:
-            await u.send("An error occurred during matching, so it has been aborted.")
+            await u.send("Une erreur est survenue lors du tirage au sort, et il a été abandonné.")
 
     else:
         for i in range(len(successful_users)):
