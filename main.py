@@ -81,7 +81,6 @@ current_column += 1
 secretMessages = [(line[current_column] if len(line) > current_column else '')
                   for line in result_input.get('values', [])]
 
-
 if Config.HAS_CONFLICT_MANAGEMENT:
     current_column += 1
 
@@ -96,8 +95,8 @@ for c in range(n):
 
 print(conflicts)
 
-
 print(f"This script will send a message to the {n} following people:")
+
 for contact in contacts:
     print(contact)
 
@@ -124,6 +123,7 @@ if flow < n:
     sys.exit()
 else:
     messages = ["" for _ in range(n)]
+
     for current_column in range(n):
         santa = hat.index(graph[current_column+n+1].index(1)-1)
         giftees[santa] = current_column
@@ -147,24 +147,29 @@ async def on_ready():
     #     print(m)
     fail = False
     successful_users = []
-    for current_column in range(n):
+
+    for i in range(n):
         user = discord.utils.get(client.get_all_members(),
-                                 name=contacts[current_column][:-5],
-                                 discriminator=contacts[current_column][-4:])
+                                 name=contacts[i][:-5],
+                                 discriminator=contacts[i][-4:])
         if user is None:
             print("user " + contacts[current_column] + " not found",
                   file=sys.stderr)
+
             fail = True
         else:
             try:
                 await user.send("Le tirage au sort va commencer, veuillez patienter...")
             except:
-                print("Could not DM user " + contacts[current_column])
+
+                print("Could not DM user " + contacts[i])
+
                 fail = True
             else:
                 successful_users += [user]
     if fail:
         print("Aborting...")
+
         for user in successful_users:
             await user.send("Une erreur est survenue lors du tirage au sort, et il a été abandonné.")
 
@@ -175,11 +180,13 @@ async def on_ready():
                 final_index = min(start_index+1999, len(messages[i])-1)
                 while messages[i][final_index] != ' ':
                     final_index -= 1
+
                 await successful_users[i].send(
                         messages[i][start_index:final_index])
                 start_index = final_index+2
             await successful_users[i].send(
                     messages[i][start_index:])
+
     await client.close()
 
 if Config.DRY_RUN:
