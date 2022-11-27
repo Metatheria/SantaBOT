@@ -153,7 +153,7 @@ async def on_ready():
                                  name=contacts[i][:-5],
                                  discriminator=contacts[i][-4:])
         if user is None:
-            print("user " + contacts[current_column] + " not found",
+            print("user " + contacts[i] + " not found",
                   file=sys.stderr)
 
             fail = True
