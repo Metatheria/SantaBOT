@@ -18,45 +18,60 @@ service = build('sheets', 'v4', credentials=creds)
 
 # Call the Sheets API
 sheet = service.spreadsheets()
-result_input = sheet.values().get(spreadsheetId=Config.SPREADSHEET_ID,
-                                  range=Config.RANGE_NAME).execute()
 
-# print(result_input.get('values', []))
+ranges = [Config.SHEET_NAME + "!" + column for column in Config.RANGES.values() if column]
+response = (sheet.values().batchGet(spreadsheetId=Config.SPREADSHEET_ID,
+                                ranges=ranges, majorDimension='COLUMNS').execute())['valueRanges']
+
+results = {}
 
 current_column = 0
-names = [line[current_column] for line in result_input.get('values', [])]
+for key in Config.RANGES.keys():
+    if Config.RANGES[key] and 'values' in response[current_column]:
+        results[key] = response[current_column]['values'][0]
+        current_column+=1
 
-if not names:
+contacts = results['contact']
+
+if not contacts:
     print('No data found.')
     sys.exit(1)
 
-n = len(names)
+n = len(contacts)
 
-current_column += 1
-contacts = [line[current_column]
-            for line in result_input.get('values', [])]
+if Config.RANGES['name']:
+    names = results['name']
+    if len(names) != n:
+        print('Someone has not registered their name')
+        sys.exit(1)
+else:
+    names = results['contact']
 
-if Config.HAS_ADDRESS:
-    current_column += 1
-    addresses = [line[current_column]
-                 for line in result_input.get('values', [])]
+if Config.RANGES['address']:
+    addresses = results['address']
+    if len(addresses) != n:
+        print('Someone has not registered their address')
+        sys.exit(1)
+else:
+    addresses = []
 
-current_column += 1
-secretMessages = [(line[current_column] if len(line) > current_column else '')
-                  for line in result_input.get('values', [])]
+if Config.RANGES['mess_to_santa']:
+    santa_messages = results['mess_to_santas']
+    santa_messages += ['']*(n-len(santa_messages))
+else:
+    santa_messages = []
 
+print(len(santa_messages))
 
-if Config.HAS_CONFLICT_MANAGEMENT:
-    current_column += 1
-
-conflicts = [[names.index(name)
-              for name in (line[current_column].split(',')
-                           if Config.HAS_CONFLICT_MANAGEMENT
-                           and len(line) > current_column else [])]
-             for line in result_input.get('values', [])]
-
-for c in range(n):
-    conflicts[c] += [c]
+if Config.RANGES['conflicts']:
+    conflicts = [[names.index(name)
+                for name in (conflict.split(','))]
+                for conflict in results['conflicts']]
+    conflicts += [[]]*(n-len(conflicts))
+    for c in range(n):
+        conflicts[c] += [c]
+else:
+    conflicts = [[c] for c in range(n)]
 
 print(conflicts)
 
