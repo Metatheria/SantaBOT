@@ -1,6 +1,7 @@
 *.json
 config.py
 clear_dms.py
+test*.py
 
 __pycache__
 __pycache__/*

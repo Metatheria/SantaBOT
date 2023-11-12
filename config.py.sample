@@ -4,17 +4,31 @@
 class Config:
     """Class storing configuration constants."""
     # You should not have to touch this line
-    SHEETS_SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+    SHEETS_SCOPES = ['https://www.googleapis.com/auth/pubsub',
+                    'https://www.googleapis.com/auth/spreadsheets']
     # Your Google API key file
-    GOOGLE_KEY_FILE = 'your-key.json'
+    GOOGLE_KEY_FILE = ''
 
     # ID Of the Spreadsheet
-    SPREADSHEET_ID = 'your-sheet-id'
-    # Used Range in the spreadsheet
-    RANGE_NAME = 'B2:D'
+    SPREADSHEET_ID = ''
+
+    SHEET_NAME = ''
+
+    RANGES = {
+        #Column in the spreadsheet used for storing contact information (mandatory)
+        'contact'           : 'A:A',
+        #Column for storing conflicts (matches which need to be avoided, optional)
+        'conflicts'         : None,
+        #Column in the spreadsheet used for storing notes to Santas (optional)
+        'mess_to_santa'     : None,
+        #Column in the spreadsheet used for storing people's names (optional, contact info will be used instead if left empty)
+        'name'              : 'B:B',
+        #Column in the spreadsheet used for storing people's address (optional)  
+        'address'           : None,
+    }
 
     # Replace with your Discord bot token (if sending messages via Discord)
-    DISCORD_BOT_TOKEN = 'your discord bot token'
+    DISCORD_BOT_TOKEN = ''
     # Replace with your bot's email address (if sending emails)
     BOT_EMAIL = ''
     # Replace with your bot's email password (if sending emails)
@@ -22,11 +36,7 @@ class Config:
 
     # Value is either 'discord' or 'email'
     CONTACT_METHOD = 'discord'
-    # Does the form include postal addresses ? (in case deliveries are needed)
-    HAS_ADDRESS = True
-    # Should the bot manage conflicts and exceptions?
-    # (will fail if there are too many constraints)
-    HAS_CONFLICT_MANAGEMENT = False
 
     # Is this a dry run ? True will print to console instead of sending PM
     DRY_RUN = True
+

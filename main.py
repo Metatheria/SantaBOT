@@ -2,49 +2,13 @@
 
 import random
 import sys
-import smtplib
-import ssl
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.header import Header
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
-import discord
 
 from config import Config
+from discord_client import DiscordClient
+from email_client import EmailClient
 from maxflow import maxflow
-
-
-def send_emails(messages, names):
-    port = 465  # For SSL
-    password = Config.BOT_PASSWORD
-    sender_email = Config.BOT_EMAIL
-
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
-        server.login(sender_email, password)
-        for i in range(n):
-            email = MIMEMultipart('alternative')
-
-            email.set_charset('utf8')
-
-            email['FROM'] = sender_email
-
-            # This solved the problem with the encode on the subject.
-            email['Subject'] = Header(f"Tirage au sort Secret Santa {names[i]}", 'utf-8')
-            email['To'] = contacts[i]
-
-            # And this on the body
-            _attach = MIMEText(messages[i].encode('utf-8'), 'html', 'UTF-8')
-
-            email.attach(_attach)
-
-            # Create a secure SSL context
-            server.sendmail(sender_email, contacts[i], email.as_string())
-
-intents = discord.Intents.default()
-intents.members = True
-client = discord.Client(intents=intents)
 
 creds = service_account.Credentials.from_service_account_file(
         Config.GOOGLE_KEY_FILE,
@@ -128,59 +92,13 @@ else:
         santa = hat.index(graph[current_column+n+1].index(1)-1)
         giftees[santa] = current_column
 
-        messages[santa] = f"Ton bébé Noël est...|| ** {names[current_column]} ** || !\n"
+        messages[santa] = f"Tu as tiré...|| ** {names[current_column]} ** || !\n"
 
-        if Config.HAS_ADDRESS:
-            messages[santa] += f'\nSon adresse est:\n {addresses[current_column]} \n'
-
-        if secretMessages[giftees[current_column]]:
-            if secretMessages[current_column] != '':
-                messages[santa] += f'\nIel t\'a laissé le message suivant: {secretMessages[current_column]}'
+        if santa_messages and santa_messages[giftees[current_column]]:
+            if santa_messages[current_column] != '':
+                messages[santa] += f'\nIel t\'a laissé le message suivant: {santa_messages[current_column]}'
             else:
                 messages[santa] += "\nIel ne t'a pas laissé de message."
-
-
-@client.event
-async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
-    # for m in client.get_all_members():
-    #     print(m)
-    fail = False
-    successful_users = []
-    for current_column in range(n):
-        user = discord.utils.get(client.get_all_members(),
-                                 name=contacts[current_column][:-5],
-                                 discriminator=contacts[current_column][-4:])
-        if user is None:
-            print("user " + contacts[i] + " not found",
-                  file=sys.stderr)
-            fail = True
-        else:
-            try:
-                await user.send("Le tirage au sort va commencer, veuillez patienter...")
-            except:
-                print("Could not DM user " + contacts[current_column])
-                fail = True
-            else:
-                successful_users += [user]
-    if fail:
-        print("Aborting...")
-        for user in successful_users:
-            await user.send("Une erreur est survenue lors du tirage au sort, et il a été abandonné.")
-
-    else:
-        for i in range(len(successful_users)):
-            start_index = 0
-            while len(messages[i][start_index:]) > 2000:
-                final_index = min(start_index+1999, len(messages[i])-1)
-                while messages[i][final_index] != ' ':
-                    final_index -= 1
-                await successful_users[i].send(
-                        messages[i][start_index:final_index])
-                start_index = final_index+2
-            await successful_users[i].send(
-                    messages[i][start_index:])
-    await client.close()
 
 if Config.DRY_RUN:
     for i in range(n):
@@ -188,10 +106,10 @@ if Config.DRY_RUN:
         print(messages[i])
 else:
     if Config.CONTACT_METHOD == 'email':
-        send_emails(messages, names)
-        print("Done!")
+        client = EmailClient(messages, names, contacts, addresses, giftees)
+        client.send_matches()
     elif Config.CONTACT_METHOD == 'discord':
-        client.run(Config.DISCORD_BOT_TOKEN)
-        print("Done!")
+        client = DiscordClient(messages, names, contacts, addresses, giftees)
+        client.run()
     else:
         print("You have not selected a valid contact method!\nPlease select either \'email\' or \'discord\' in config.py")
